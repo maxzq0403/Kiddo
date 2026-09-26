@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>สนุกกับคำศัพท์ภาษาอังกฤษ</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF8EC; --navy:#073B4C; --coral:#FF6B6B; --sun:#FFD166;
+    --sky:#4FB6FF; --mint:#06D6A0; --violet:#9B7EDE; --card:#ffffff;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:var(--cream); color:var(--navy); font-family:'Nunito',sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; margin:0;}
+  header{padding:2rem 1.2rem 1.5rem; text-align:center;}
+  header h1{font-size:clamp(1.8rem,5vw,2.6rem); color:var(--coral);}
+  header p{margin-top:.4rem; font-size:1.05rem; opacity:.85;}
+  .wrap{max-width:920px; margin:0 auto; padding:0 1rem 3rem;}
+  nav.tabs{display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; margin-bottom:1.8rem;}
+  nav.tabs button{
+    font-family:'Baloo 2',sans-serif; font-size:1rem; font-weight:700; border:none;
+    padding:.6rem 1.3rem; border-radius:999px; cursor:pointer; background:#fff;
+    color:var(--navy); box-shadow:0 2px 0 rgba(0,0,0,.08); transition:transform .15s ease;
+  }
+  nav.tabs button:hover{transform:translateY(-2px);}
+  nav.tabs button.active{color:#fff;}
+  section.category{display:none;}
+  section.category.active{display:block; animation:pop .35s ease;}
+  @keyframes pop{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .block-title{display:flex; align-items:center; gap:.6rem; margin:1.6rem 0 1rem;}
+  .block-title .dot{width:14px; height:14px; border-radius:50%;}
+  .block-title h2{font-size:1.3rem;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.9rem;}
+  .card{
+    background:var(--card); border-radius:18px; padding:.9rem .7rem 1rem; text-align:center;
+    box-shadow:0 3px 0 rgba(0,0,0,.06); border:3px solid transparent;
+  }
+  .card .emoji{font-size:2.4rem; line-height:1; margin-bottom:.4rem; display:block;}
+  .swatch{width:52px; height:52px; border-radius:50%; margin:0 auto .5rem; border:3px solid rgba(0,0,0,.08);}
+  .card .word{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:1.15rem;}
+  .card .phon{font-size:.85rem; color:#6b7c85; margin-top:.1rem;}
+  .card .th{font-size:.95rem; margin-top:.35rem; font-weight:600;}
+  .practice-box{
+    background:#fff; border-radius:22px; padding:1.3rem 1.1rem; margin-top:1rem;
+    box-shadow:0 4px 0 rgba(0,0,0,.06);
+  }
+  .q-emoji, .q-swatch{font-size:3.4rem; text-align:center; margin-bottom:.3rem;}
+  .q-swatch{width:70px; height:70px; border-radius:50%; margin:0 auto .8rem; border:4px solid rgba(0,0,0,.08);}
+  .q-text{text-align:center; font-size:1.05rem; margin-bottom:1rem;}
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:.7rem;}
+  .choices button{
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:1.02rem; padding:.8rem .5rem;
+    border-radius:14px; border:2px solid #e4ded0; background:#fffdf8; cursor:pointer;
+  }
+  .choices button.correct{background:#d6f5ea; border-color:var(--mint);}
+  .choices button.wrong{background:#ffe1e1; border-color:var(--coral);}
+  .feedback{text-align:center; margin-top:.8rem; font-weight:800; min-height:1.4rem;}
+  .progress{text-align:center; font-size:.9rem; opacity:.7; margin-top:.6rem;}
+  .next-btn{display:block; margin:1rem auto 0; font-family:'Baloo 2'; font-weight:700; background:var(--navy);
+    color:#fff; border:none; padding:.6rem 1.4rem; border-radius:999px; cursor:pointer;}
+  footer{text-align:center; font-size:.85rem; opacity:.6; padding-bottom:1.5rem;}
+</style>
+</head>
+<body>
+<header>
+  <h1>สนุกกับคำศัพท์ภาษาอังกฤษ</h1>
+  <p>สี • วัน 7 วัน • เดือน • ฤดู — เรียนก่อน แล้วมาฝึกกัน!</p>
+</header>
+
+<div class="wrap">
+  <nav class="tabs" id="tabs"></nav>
+  <div id="sections"></div>
+</div>
+
+<footer>ทำเสร็จแล้ว ลองสลับหมวดแล้วฝึกซ้ำได้เรื่อยๆ 🌟</footer>
+
+<script>
+const DATA = {
+  colors: {
+    label: "สี", color: "#FF6B6B",
+    items: [
+      {en:"Red", phon:"เรด", th:"สีแดง", swatch:"#E4572E"},
+      {en:"Blue", phon:"บลู", th:"สีน้ำเงิน", swatch:"#3A86FF"},
+      {en:"Yellow", phon:"เยลโล่ว", th:"สีเหลือง", swatch:"#FFD166"},
+      {en:"Green", phon:"กรีน", th:"สีเขียว", swatch:"#3EB489"},
+      {en:"Orange", phon:"ออเรนจ์", th:"สีส้ม", swatch:"#FF8C42"},
+      {en:"Purple", phon:"เพอเพิล", th:"สีม่วง", swatch:"#9B5DE5"},
+      {en:"Pink", phon:"พิงก์", th:"สีชมพู", swatch:"#FF7FB0"},
+      {en:"Black", phon:"แบล็ก", th:"สีดำ", swatch:"#2B2B2B"},
+      {en:"White", phon:"ไวท์", th:"สีขาว", swatch:"#F4F4F4"},
+      {en:"Brown", phon:"บราวน์", th:"สีน้ำตาล", swatch:"#8B5A2B"}
+    ]
+  },
+  days: {
+    label: "วัน 7 วัน", color:"#4FB6FF",
+    items:[
+      {en:"Sunday", phon:"ซันเดย์", th:"วันอาทิตย์", emoji:"☀️"},
+      {en:"Monday", phon:"มันเดย์", th:"วันจันทร์", emoji:"🌙"},
+      {en:"Tuesday", phon:"ทิวส์เดย์", th:"วันอังคาร", emoji:"🔥"},
+      {en:"Wednesday", phon:"เว้นส์เดย์", th:"วันพุธ", emoji:"🌳"},
+      {en:"Thursday", phon:"เธิร์สเดย์", th:"วันพฤหัสบดี", emoji:"⚡"},
+      {en:"Friday", phon:"ไฟรเดย์", th:"วันศุกร์", emoji:"⭐"},
+      {en:"Saturday", phon:"แซทเทอร์เดย์", th:"วันเสาร์", emoji:"🪐"}
+    ]
+  },
+  months: {
+    label:"เดือน", color:"#9B7EDE",
+    items:[
+      {en:"January", phon:"แจนยูเอรี่", th:"มกราคม", emoji:"🎉"},
+      {en:"February", phon:"เฟบรูเอรี่", th:"กุมภาพันธ์", emoji:"💗"},
+      {en:"March", phon:"มาร์ช", th:"มีนาคม", emoji:"🌷"},
+      {en:"April", phon:"เอพริล", th:"เมษายน", emoji:"🌦️"},
+      {en:"May", phon:"เมย์", th:"พฤษภาคม", emoji:"🌸"},
+      {en:"June", phon:"จูน", th:"มิถุนายน", emoji:"☔"},
+      {en:"July", phon:"จูไล", th:"กรกฎาคม", emoji:"🎆"},
+      {en:"August", phon:"ออกัสต์", th:"สิงหาคม", emoji:"🌻"},
+      {en:"September", phon:"เซปเทมเบอร์", th:"กันยายน", emoji:"📚"},
+      {en:"October", phon:"ออกโทเบอร์", th:"ตุลาคม", emoji:"🎃"},
+      {en:"November", phon:"โนเวมเบอร์", th:"พฤศจิกายน", emoji:"🍂"},
+      {en:"December", phon:"ดีเซมเบอร์", th:"ธันวาคม", emoji:"🎄"}
+    ]
+  },
+  seasons: {
+    label:"ฤดู", color:"#06D6A0",
+    items:[
+      {en:"Spring", phon:"สปริง", th:"ฤดูใบไม้ผลิ", emoji:"🌸"},
+      {en:"Summer", phon:"ซัมเมอร์", th:"ฤดูร้อน", emoji:"☀️"},
+      {en:"Autumn", phon:"ออทัมน์", th:"ฤดูใบไม้ร่วง", emoji:"🍂"},
+      {en:"Winter", phon:"วินเทอร์", th:"ฤดูหนาว", emoji:"❄️"}
+    ]
+  }
+};
+
+const tabsEl = document.getElementById('tabs');
+const sectionsEl = document.getElementById('sections');
+const keys = Object.keys(DATA);
+
+keys.forEach((key,i)=>{
+  const cat = DATA[key];
+  const btn = document.createElement('button');
+  btn.textContent = cat.label;
+  btn.style.background = i===0 ? cat.color : '#fff';
+  btn.style.color = i===0 ? '#fff' : 'inherit';
+  btn.className = i===0 ? 'active' : '';
+  btn.onclick = ()=> showTab(key);
+  btn.dataset.key = key;
+  tabsEl.appendChild(btn);
+
+  const section = document.createElement('section');
+  section.className = 'category' + (i===0 ? ' active':'');
+  section.id = 'sec-'+key;
+  section.innerHTML = `
+    <div class="block-title"><span class="dot" style="background:${cat.color}"></span><h2>ส่วนเรียนรู้ — ${cat.label}</h2></div>
+    <div class="cards">${cat.items.map(it=>`
+      <div class="card">
+        ${it.swatch ? `<div class="swatch" style="background:${it.swatch}"></div>` : `<span class="emoji">${it.emoji}</span>`}
+        <div class="word">${it.en}</div>
+        <div class="phon">อ่านว่า "${it.phon}"</div>
+        <div class="th">${it.th}</div>
+      </div>`).join('')}
+    </div>
+    <div class="block-title"><span class="dot" style="background:${cat.color}"></span><h2>ส่วนฝึกหัด — ${cat.label}</h2></div>
+    <div class="practice-box" id="practice-${key}"></div>
+  `;
+  sectionsEl.appendChild(section);
+});
+
+function showTab(key){
+  keys.forEach(k=>{
+    document.getElementById('sec-'+k).classList.toggle('active', k===key);
+  });
+  tabsEl.querySelectorAll('button').forEach(b=>{
+    const active = b.dataset.key === key;
+    b.classList.toggle('active', active);
+    b.style.background = active ? DATA[key].color : '#fff';
+    b.style.color = active ? '#fff' : 'inherit';
+  });
+  if(!quizState[key]) startQuiz(key);
+}
+
+// --- Quiz logic ---
+const quizState = {};
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+function startQuiz(key){
+  const items = shuffle(DATA[key].items);
+  quizState[key] = { order: items, idx: 0, score: 0 };
+  renderQuestion(key);
+}
+
+function renderQuestion(key){
+  const state = quizState[key];
+  const box = document.getElementById('practice-'+key);
+  if(state.idx >= state.order.length){
+    box.innerHTML = `<div class="q-text">🎉 เก่งมาก! ได้ ${state.score} จาก ${state.order.length} ข้อ</div>
+      <button class="next-btn" onclick="startQuiz('${key}')">ฝึกอีกครั้ง</button>`;
+    return;
+  }
+  const current = state.order[state.idx];
+  const allItems = DATA[key].items;
+  let wrongPool = shuffle(allItems.filter(i=>i.en!==current.en)).slice(0,3);
+  const choices = shuffle([current, ...wrongPool]);
+
+  const visual = current.swatch
+    ? `<div class="q-swatch" style="background:${current.swatch}"></div>`
+    : `<div class="q-emoji">${current.emoji}</div>`;
+
+  box.innerHTML = `
+    ${visual}
+    <div class="q-text">นี่คือคำว่าอะไรในภาษาอังกฤษ?<br><strong>(${current.th})</strong></div>
+    <div class="choices">${choices.map(c=>`<button data-en="${c.en}">${c.en}</button>`).join('')}</div>
+    <div class="feedback" id="fb-${key}"></div>
+    <div class="progress">ข้อ ${state.idx+1} / ${state.order.length}</div>
+  `;
+
+  box.querySelectorAll('.choices button').forEach(btn=>{
+    btn.onclick = ()=>{
+      const correct = btn.dataset.en === current.en;
+      box.querySelectorAll('.choices button').forEach(b=>{
+        b.disabled = true;
+        if(b.dataset.en === current.en) b.classList.add('correct');
+        else if(b === btn) b.classList.add('wrong');
+      });
+      document.getElementById('fb-'+key).textContent = correct ? "✅ ถูกต้อง!" : `❌ ที่ถูกคือ ${current.en}`;
+      if(correct) state.score++;
+      setTimeout(()=>{ state.idx++; renderQuestion(key); }, 900);
+    };
+  });
+}
+
+startQuiz('colors');
+</script>
+</body>
+</html>
